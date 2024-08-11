@@ -1,0 +1,104 @@
+import os
+import sys
+
+# Añadir la carpeta raíz al PYTHONPATH
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.csv_operations import read_csv, write_csv, update_csv, delete_from_csv
+from utils.validation import validate_sku, validate_quantity
+from utils.procedures import add_item, update_item, delete_item
+
+def test_csv_operations():
+    filename = 'test_items.csv'
+    
+    # Datos de prueba
+    initial_data = [
+        {'SKU': '123', 'Name': 'Item1', 'Stock': '10'},
+        {'SKU': '456', 'Name': 'Item2', 'Stock': '20'}
+    ]
+    
+    # Escribir datos iniciales
+    write_csv(filename, initial_data)
+    
+    # Leer datos
+    data = read_csv(filename)
+    print("Data after write_csv:", data)
+    
+    # Actualizar datos
+    update_csv(filename, '123', {'Name': 'UpdatedItem1', 'Stock': '15'})
+    updated_data = read_csv(filename)
+    print("Data after update_csv:", updated_data)
+    
+    # Eliminar datos
+    delete_from_csv(filename, '456')
+    final_data = read_csv(filename)
+    print("Data after delete_from_csv:", final_data)
+    
+    # Limpiar archivo de prueba
+    os.remove(filename)
+
+def test_validation():
+    filename = 'test_items.csv'
+    
+    # Datos de prueba
+    initial_data = [
+        {'SKU': '123', 'Name': 'Item1', 'Stock': '10'},
+        {'SKU': '456', 'Name': 'Item2', 'Stock': '20'}
+    ]
+    
+    # Escribir datos iniciales
+    write_csv(filename, initial_data)
+    
+    # Leer datos para validación
+    data = read_csv(filename)
+    
+    # Validar SKU
+    sku_exists = validate_sku('123', data)
+    sku_not_exists = validate_sku('789', data)
+    print("SKU '123' exists:", sku_exists)
+    print("SKU '789' exists:", sku_not_exists)
+    
+    # Validar cantidad
+    quantity_valid = validate_quantity(5, 10)
+    quantity_invalid = validate_quantity(15, 10)
+    print("Quantity 5 valid for stock 10:", quantity_valid)
+    print("Quantity 15 valid for stock 10:", quantity_invalid)
+    
+    # Limpiar archivo de prueba
+    os.remove(filename)
+
+def test_procedures():
+    filename = 'test_items.csv'
+    
+    # Datos iniciales
+    initial_data = [
+        {'SKU': '123', 'Name': 'Item1', 'Stock': '10'}
+    ]
+    write_csv(filename, initial_data)
+    
+    # Agregar ítem
+    new_item = {'SKU': '456', 'Name': 'Item2', 'Stock': '20'}
+    add_item(filename, new_item)
+    data = read_csv(filename)
+    print("Data after add_item:", data)
+    
+    # Actualizar ítem
+    update_item(filename, '123', {'Name': 'UpdatedItem1', 'Stock': '15'})
+    updated_data = read_csv(filename)
+    print("Data after update_item:", updated_data)
+    
+    # Eliminar ítem
+    delete_item(filename, '456')
+    final_data = read_csv(filename)
+    print("Data after delete_item:", final_data)
+    
+    # Limpiar archivo de prueba
+    os.remove(filename)
+
+if __name__ == "__main__":
+    print("Testing CSV Operations:")
+    test_csv_operations()
+    print("\nTesting Validation Functions:")
+    test_validation()
+    print("\nTesting Procedures:")
+    test_procedures()
